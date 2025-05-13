@@ -1,24 +1,33 @@
 import React from "react";
 import { translations } from "../../utils/translation";
 // import img from "../../assets/img/Bands/5g.png";
+import frown from "../../assets/img/frown.png";
 
 interface UnregisteredDeviceProps {
   data: any; // Replace 'any' with the actual type of 'data' if known
 }
 
-const UnregisteredDevice: React.FC<UnregisteredDeviceProps> = ({ data }) => {
+const UnregisteredDevice = ({
+  data,
+  onReset,
+}: {
+  data: any;
+  onReset: () => void;
+}) => {
   const language = "EN";
   const t = translations[language];
   return (
-    <div>
-      <h1 className="text-2xl font-bold text-black text-center mt-10">
-        IMEI CONSULTADO: {data.imeiNumber}
+    <div className="flex flex-col items-center center">
+      <img src={frown} alt="Frown" className="w-20 h-20 mx-auto "/>
+      <h1 className="text-2xl font-bold text-[#DA291C] text-center mt-10">
+        <span className="block sm:inline">IMEI Consultado:</span>{' '}
+        <span className="block sm:inline">{data.imeiNumber}</span>
       </h1>
       <div className="flex flex-col items-center gap-4 mt-4">
         <p className="text-lg">
-          Tu equipo no se encuentra inscrito en el sistema y no puede funcionar
-          en las redes móviles nacionales. Si tu equipo lo trajiste desde el
-          extranjero, lo debes inscribir. Ingresa a https://multibanda.cl/ia,
+          Tu equipo <span className="text-[#DA291C] font-bold">no se encuentra inscrito en el sistema y no puede funcionar
+          en las redes móviles nacionales.</span> Si tu equipo lo trajiste desde el
+          extranjero, lo debes inscribir. Ingresa a <a href="https://multibanda.cl/ia" className="text-[#0097A9] underline font-bold line">multibanda.cl/ia</a> ,
           para conocer el procedimiento.
         </p>
         <p className="text-lg">
@@ -33,12 +42,15 @@ const UnregisteredDevice: React.FC<UnregisteredDeviceProps> = ({ data }) => {
           o el cambio de equipo por uno homologado y eventualmente,
           indemnización de daños y perjuicios (esto último, en tribunales).
         </p>
-        <p>
+        
+        <div className="bg-[#F5F7FC] py-6 px-8 rounded-3xl mt-4 ">
+        <p className="font-bold my-2">
           Todos los IMEI de los equipos móviles, tanto teléfonos como otros
           dispositivos, deberán estar inscritos en un sistema centralizado para
           poder operar en las redes nacionales.
         </p>
-        <p>Multibanda SAE – Ver información detallada en www.multibanda.cl</p>
+        <p>Multibanda SAE – Ver información detallada en <a href="https://multibanda.cl" className="text-[#0097A9] underline font-bold line">https://multibanda.cl</a></p>
+        </div>
         <button
           className="red-button px-4 mt-6"
           onClick={() =>
@@ -50,7 +62,9 @@ const UnregisteredDevice: React.FC<UnregisteredDeviceProps> = ({ data }) => {
         >
           Inscripción Administrativa
         </button>
-        <button className="red-button px-4 mt-6">Consultar otro IMEI</button>
+        <button className="red-button " onClick={onReset}>
+          Consultar otro IMEI
+        </button>
       </div>
     </div>
   );

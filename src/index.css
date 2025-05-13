@@ -5,11 +5,11 @@
 
 @layer components {
   .red-button {
-    @apply px-4 rounded-full border h-10 text-[#AF272F] border-[#AF272F] ;
+    @apply px-4 rounded-full border-[3px]  w-64 h-10 text-[#DA291C] border-[#DA291C] ;
   }
 
   .red-button:hover {
-    @apply bg-[#AF272F] text-white shadow-lg;
+    @apply bg-[#DA291C] text-white shadow-lg;
   }
 
   .red-button-shadow:hover {

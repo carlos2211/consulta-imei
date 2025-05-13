@@ -1,4 +1,4 @@
-import React, { JSX, useEffect, useState } from "react";
+import React, { JSX, useState } from "react";
 import imgStage1D from "../assets/img/Stage1.png";
 import imgStage2D from "../assets/img/Stage2.png";
 import imgStage3D from "../assets/img/Stage3.png";
@@ -8,10 +8,13 @@ import EnrolledLockedDevice from "./Views/EnrolledLockedDevice";
 import RegisteredUnlockedDevice from "./Views/RegisteredUnlockedDevice";
 import UnregisteredDevice from "./Views/UnregisteredDevice";
 
-
-const Stages = ({ language }: { language: "ES" | "EN" }) => {
-  const [componenteRenderizado, setComponenteRenderizado] =
-    useState<JSX.Element | null>(null);
+const Stages = ({
+  language,
+  onRenderFinal,
+}: {
+  language: "ES" | "EN";
+  onRenderFinal: (componente: JSX.Element) => void;
+}) => {
   const [imei, setImei] = useState("");
   const isMobile = useIsMobile(500);
   const t = translations[language];
@@ -39,16 +42,28 @@ const Stages = ({ language }: { language: "ES" | "EN" }) => {
       const data = result[1];
 
       if (data.estado_claro === "Equipo Desbloqueado" && data.baseOabi !== "") {
-        setComponenteRenderizado(<RegisteredUnlockedDevice data={data} />);
+        console.log("✅ Llamando a onRenderFinal con RegisteredUnlockedDevice");
+        onRenderFinal(
+          <RegisteredUnlockedDevice
+            data={data}
+            onReset={() => {
+              setImei(""); 
+              onRenderFinal(<></>); 
+            }}
+          />
+        );
       } else if (
         data.estado_claro !== "Equipo Desbloqueado" &&
         data.tipoInscripcion
       ) {
-        setComponenteRenderizado(<EnrolledLockedDevice data={data} />);
+        onRenderFinal(<EnrolledLockedDevice data={data} onReset={function (): void {
+          throw new Error("Function not implemented.");
+        } } />);
       } else {
-        setComponenteRenderizado(<UnregisteredDevice data={data} />);
+        onRenderFinal(<UnregisteredDevice data={data} onReset={function (): void {
+          throw new Error("Function not implemented.");
+        } } />);
       }
-
       console.log("Respuesta de la API:", result);
     } catch (error) {
       console.error("Error al consultar el IMEI:", error);
@@ -56,11 +71,10 @@ const Stages = ({ language }: { language: "ES" | "EN" }) => {
   };
 
   return (
-    <div className="flex flex-col items-center w-full  mt-10">
-      {/* Mobile Layout */}
+    <div className="flex flex-col items-center w-full mt-10">
       {isMobile ? (
         <div className="relative flex flex-col items-start max-w-5xl w-full mb-10">
-          <div className="absolute top-[32px] bottom-[115px]  w-1 z-0 bg-[#008C67]" />
+          <div className="absolute top-[32px] bottom-[115px] w-1 z-0 bg-[#008C67]" />
           <div className="flex flex-col gap-4 pl-2 w-full">
             {[1, 2, 3, 4].map((num, idx) => (
               <div key={num} className="flex items-start gap-4 relative">
@@ -71,7 +85,6 @@ const Stages = ({ language }: { language: "ES" | "EN" }) => {
                   <p className="text-sm w-[120px] text-[#008C67] mt-2 h-14 font-bold leading-tight">
                     {t.steps[idx]}
                   </p>
-
                   {idx < 3 ? (
                     <img
                       src={[imgStage1D, imgStage2D, imgStage3D][idx]}
@@ -87,7 +100,6 @@ const Stages = ({ language }: { language: "ES" | "EN" }) => {
                         value={imei}
                         onChange={(e) => setImei(e.target.value)}
                         onKeyDown={(e) => {
-                          // Permite teclas de navegación y borrado
                           const allowedKeys = [
                             "Backspace",
                             "Tab",
@@ -95,13 +107,11 @@ const Stages = ({ language }: { language: "ES" | "EN" }) => {
                             "ArrowRight",
                             "Delete",
                           ];
-
                           if (
                             (e.ctrlKey || e.metaKey) &&
                             e.key.toLowerCase() === "v"
                           )
                             return;
-
                           if (
                             !/^\d$/.test(e.key) &&
                             !allowedKeys.includes(e.key)
@@ -127,17 +137,15 @@ const Stages = ({ language }: { language: "ES" | "EN" }) => {
           </div>
         </div>
       ) : (
-        //Desktop Layout
         <div className="flex flex-col items-center w-full px-4">
           <div className="relative w-full max-w-5xl flex justify-between items-center ">
-            <div className="absolute  left-[12.5%] right-[12.5%] h-1 z-0 bg-[#008C67]" />
-
+            <div className="absolute left-[12.5%] right-[12.5%] h-1 z-0 bg-[#008C67]" />
             {[1, 2, 3, 4].map((num) => (
               <div
                 key={num}
                 className="relative z-10 flex flex-col items-center w-1/4"
               >
-                <div className="w-10 h-10 rounded-full bg-[#008C67]  text-white flex items-center justify-center font-bold mb-2">
+                <div className="w-10 h-10 rounded-full bg-[#008C67] text-white flex items-center justify-center font-bold mb-2">
                   {num}
                 </div>
               </div>
@@ -158,7 +166,7 @@ const Stages = ({ language }: { language: "ES" | "EN" }) => {
               <img src={imgStage3D} alt="Stage 3" className="ml-12 w-37" />
             </div>
             <div>
-              <p className=" text-[#008C67] h-12">{t.steps[3]}</p>
+              <p className="text-[#008C67] h-12">{t.steps[3]}</p>
               <div className="flex flex-col items-center gap-2 mt-5">
                 <input
                   className="border border-black px-2 py-1 rounded-xl w-40 h-10 text-center"
@@ -189,10 +197,6 @@ const Stages = ({ language }: { language: "ES" | "EN" }) => {
             </div>
           </div>
         </div>
-      )}
-
-      {componenteRenderizado && (
-        <div className="mt-10 w-full">{componenteRenderizado}</div>
       )}
     </div>
   );
